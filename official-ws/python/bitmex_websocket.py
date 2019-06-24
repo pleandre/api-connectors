@@ -22,10 +22,11 @@ class BitMEXWebsocket:
     # Don't grow a table larger than this amount. Helps cap memory usage.
     MAX_TABLE_LEN = 200
 
-    def __init__(self, endpoint, symbol, api_key=None, api_secret=None):
+    def __init__(self, endpoint, symbol, api_key=None, api_secret=None, callback=None):
         '''Connect to the websocket and initialize data stores.'''
         self.logger = logging.getLogger(__name__)
         self.logger.debug("Initializing WebSocket.")
+        self.callback = callback
 
         self.endpoint = endpoint
         self.symbol = symbol
@@ -239,6 +240,8 @@ class BitMEXWebsocket:
                         self.data[table].remove(item)
                 else:
                     raise Exception("Unknown action: %s" % action)
+            if self.callback is not None:
+                self.callback()
         except:
             self.logger.error(traceback.format_exc())
 
